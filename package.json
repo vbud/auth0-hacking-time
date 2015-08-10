@@ -1,0 +1,23 @@
+{
+  "name": "auth0-hacking-time",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vbud/auth0-hacking-time.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vbud/auth0-hacking-time/issues"
+  },
+  "homepage": "https://github.com/vbud/auth0-hacking-time#readme",
+  "dependencies": {
+    "base64-js": "0.0.8",
+    "request": "^2.60.0"
+  }
+}
