@@ -1,5 +1,8 @@
-var hello = require('./hello');
+'use strict';
 
-hello(function(nothing, input) {
+var hello = require('./hello');
+var ctx = require('./local');
+
+hello(ctx, function(nothing, input) {
   console.log(input);
 });
