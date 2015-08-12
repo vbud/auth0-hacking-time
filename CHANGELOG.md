@@ -7,6 +7,7 @@
 - WEBTASK: update changelog with most recent commit message
 - WEBTASK: update changelog with most recent commit message
 - WEBTASK: update changelog with most recent commit message
+- WEBTASK: update changelog with most recent commit message
 - Merge branch 'master' of https://github.com/vbud/auth0-hacking-time
 - WEBTASK: update changelog with most recent commit message
 - Initial commit
