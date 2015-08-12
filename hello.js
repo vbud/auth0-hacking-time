@@ -4,7 +4,6 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var requestOriginal = require('request');
 //requestOriginal.debug = true;
-var base64 = require('base64-js');
 
 /*
  how to commit a change to a file in the repo
@@ -22,8 +21,7 @@ module.exports = function (ctx, cb) {
 
 	var request = Promise.promisify(requestOriginal.defaults({
 		headers: {
-			//'User-Agent': ctx.data.GITHUB_USER,
-			'User-Agent': 'vbud',
+			'User-Agent': ctx.data.GITHUB_USER,
 			'Authorization': 'token ' + ctx.data.GITHUB_TOKEN
 		},
 		json: true
@@ -37,19 +35,14 @@ module.exports = function (ctx, cb) {
 	//retrieve the content of the blob object for CHANGELOG.md
 	//TODO: This assumes there is only one branch; it does not do the first two steps in the how-to block above. A production version of this would need to do that.
 	request({
-		uri: 'https://api.github.com/repos/vbud/auth0-hacking-time/contents/' + filename + '?ref=' + branch
+		uri: 'https://api.github.com/repos/vbud/auth0-hacking-time/contents/' + filename + '?ref=' + branch,
+		headers: {
+			'Accept': 'application/vnd.github.v3.raw'
+		},
+		json: false
 	})
 		.then(function (results) {
-			var content = results[1].content;
-
-			var changelogByteArray = base64.toByteArray(content.replace('\n', ''));
-
-			Object.keys(changelogByteArray).forEach(function (key) {
-				changelog = changelog.concat(String.fromCharCode(changelogByteArray[key]));
-			});
-
-			//get the most recent commit message
-			//return request({uri: 'https://api.github.com/repos/vbud/auth0-hacking-time/commits'});
+			changelog = results[1];
 
 			//get the reference to HEAD
 			return request({
@@ -57,6 +50,7 @@ module.exports = function (ctx, cb) {
 			});
 		})
 		.then(function (results) {
+			console.log('get ref to HEAD successful', results[1]);
 			var ref = results[1];
 
 			//get more information about the commit using its SHA
@@ -65,6 +59,7 @@ module.exports = function (ctx, cb) {
 			});
 		})
 		.then(function (results) {
+			console.log('get HEAD commit info successful', results[1]);
 			currentCommit = results[1];
 			changelog = '- ' + currentCommit.message + '\n' + changelog;
 
@@ -79,6 +74,7 @@ module.exports = function (ctx, cb) {
 			});
 		})
 		.then(function (results) {
+			console.log('create changelog blob successful', results[1]);
 			var blob = results[1];
 
 			//create a tree for the new blob
@@ -98,6 +94,7 @@ module.exports = function (ctx, cb) {
 
 		})
 		.then(function (results) {
+			console.log('create new tree successful', results[1]);
 			var tree = results[1];
 
 			//create a commit pointing to the new tree
@@ -112,6 +109,7 @@ module.exports = function (ctx, cb) {
 			});
 		})
 		.then(function (results) {
+			console.log('create commit pointing to new tree successful', results[1]);
 			var commit = results[1];
 
 			//update branch HEAD
@@ -125,14 +123,14 @@ module.exports = function (ctx, cb) {
 
 		})
 		.then(function (results) {
-			console.log(results[1]);
+			console.log('update branch HEAD successful', results[1]);
 
+			console.log('changelog updated successfully!');
 			cb(null, changelog);
-
 		})
 		.catch(function (err) {
-			console.error(err);
-			return cb(null, err);
+			//console.log(err);
+			return cb(err);
 		});
 
 };
